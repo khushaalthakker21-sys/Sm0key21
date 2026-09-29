@@ -1,1 +1,123 @@
-# VaultDoorTraining_dtt
+# picoCTF — Vault Door
+
+## Challenge Overview
+
+The challenge provides a Java program that asks the user to enter a vault password.
+
+The goal is to inspect the source code and find the password that allows access to the vault.
+
+The program expects the input in the following format:
+
+```text
+picoCTF{password}
+```
+
+---
+
+## Inspecting the Source Code
+
+The first step was to look through the provided Java source code.
+
+Inside the `main()` function, the program takes the user's input:
+
+```java
+String userInput = scanner.next();
+```
+
+It then removes the `picoCTF{}` part from the input:
+
+```java
+String input = userInput.substring("picoCTF{".length(), userInput.length()-1);
+```
+
+This means that if we enter:
+
+```text
+picoCTF{example}
+```
+
+the value passed to the password checker will only be:
+
+```text
+example
+```
+
+The program then passes this value to the `checkPassword()` function:
+
+```java
+if (vaultDoor.checkPassword(input)) {
+    System.out.println("Access granted.");
+} else {
+    System.out.println("Access denied!");
+}
+```
+
+Therefore, the next step is to inspect the `checkPassword()` function.
+
+---
+
+## Finding the Password
+
+Looking further down in the source code, we find:
+
+```java
+public boolean checkPassword(String password) {
+    return password.equals("w4rm1ng_Up_w1tH_jAv4_000HPpgh7Ph");
+}
+```
+
+This tells us that the password is directly stored inside the source code.
+
+The program compares our input with:
+
+```text
+w4rm1ng_Up_w1tH_jAv4_000HPpgh7Ph
+```
+
+If the two strings are equal, the program prints:
+
+```text
+Access granted.
+```
+
+Therefore, the hardcoded string is the password we need.
+
+---
+
+## Constructing the Flag
+
+Since the program removes the `picoCTF{}` wrapper before checking the password, we need to place the discovered password inside the wrapper.
+
+The password is:
+
+```text
+w4rm1ng_Up_w1tH_jAv4_000HPpgh7Ph
+```
+
+Therefore, the complete flag is:
+
+```text
+picoCTF{w4rm1ng_Up_w1tH_jAv4_000HPpgh7Ph}
+```
+
+---
+
+## Final Flag
+
+```text
+picoCTF{w4rm1ng_Up_w1tH_jAv4_000HPpgh7Ph}
+```
+
+---
+
+## Key Takeaway
+
+This challenge demonstrates the security problem with storing passwords directly inside source code.
+
+In this case, the password is not hidden or encrypted. It is directly compared against a hardcoded string in the `checkPassword()` function.
+
+If someone obtains the source code, they can simply inspect the comparison and recover the password.
+
+The main lesson is:
+
+> **Sensitive passwords should not be hardcoded directly into source code.**
